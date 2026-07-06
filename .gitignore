@@ -1,0 +1,17 @@
+# Python cache
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Local environment
+.venv/
+venv/
+ENV/
+
+# Project storage
+backend/storage/db.json
+backend/uploads/*
+!backend/uploads/.gitkeep
+
+# Environment files
+.env
