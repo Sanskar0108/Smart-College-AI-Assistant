@@ -1,6 +1,7 @@
 # 🎓 Smart College AI Assistant
 
 Smart College AI Assistant is a premium, AI-powered study workspace that converts flat study notes, slides, and PDFs into fully interactive, personalized learning environments.
+Smart College AI Assistant is a great, AI-powered study workspace that converts flat study notes, slides, and PDFs into fully interactive, personalized learning environments. 
 
 Rather than scrolling through pages of lectures, students upload documents into a single consolidated dashboard to unlock grounded Q&A chat, audio-enabled 3D flashcards, and automated self-test quizzes.
 
@@ -26,7 +27,7 @@ This application supports Google Gemini (`gemini-1.5-flash`) and Groq (`llama3-8
 
 1. Launch the application and click **Account Settings** in the top-right profile dropdown menu.
 2. Select your active provider (Google Gemini or Groq).
-3. Paste your API Key in the corresponding **Google Gemini API Key** or **Groq API Key** input boxes.
+3. Paste your API Key in the corresponding **Google Gemini API Key** or **Groq API Key** input boxes
 4. Click **Save Settings**.
    - _Note_: Keys are saved securely in your browser's local storage and sent via encrypted headers, completely protecting them from being saved on the server database or git commits.
 
