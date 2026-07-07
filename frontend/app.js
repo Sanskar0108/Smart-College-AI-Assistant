@@ -1,8 +1,4 @@
-/**
- * Smart College AI Assistant - Core Frontend Application Controller
- * Manages SPA state, routes navigation, handles mock file processing,
- * triggers mock AI chat responses, and keeps track of flashcard/quiz sessions.
- */
+
 
 class SmartCollegeApp {
   constructor() {
