@@ -426,13 +426,26 @@ const Components = {
           return `<span class="citation-link" data-page="${pNum}">Ref: Ch ${pNum}</span>`;
         });
 
+        let speakerHtml = '';
+        if (msg.sender === 'assistant') {
+          const rawText = msg.text.replace(/<[^>]*>/g, '').replace(/\[[^\]]*\]/g, '').replace(/"/g, '&quot;');
+          speakerHtml = `
+            <button class="chat-speaker-btn" data-text="${rawText}" style="background: transparent; border: none; color: var(--text-muted); cursor: pointer; display: inline-flex; align-items: center; justify-content: center; padding: 2px; border-radius: 4px; transition: all 0.2s; margin-left: 6px; vertical-align: middle;" title="Speak answer">
+              <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path></svg>
+            </button>
+          `;
+        }
+
         bubble.innerHTML = `
           <div class="message-avatar ${avatarClass}">${avatar}</div>
           <div>
             <div class="message-content">
               ${this.parseMarkdownParagraphs(renderedText)}
             </div>
-            <span class="message-time">${msg.time}</span>
+            <div style="display: flex; align-items: center; gap: 4px; margin-top: 2px;">
+              <span class="message-time">${msg.time}</span>
+              ${speakerHtml}
+            </div>
           </div>
         `;
         messageList.appendChild(bubble);
@@ -514,9 +527,22 @@ const Components = {
       messageList.scrollTop = messageList.scrollHeight;
     }, 50);
 
-    // Hook citation link click behaviors to highlight document sections
+    // Hook citation and speaker click behaviors
     messageList.addEventListener('click', (e) => {
       const citation = e.target.closest('.citation-link');
+      const speaker = e.target.closest('.chat-speaker-btn');
+      
+      if (speaker) {
+        const text = speaker.getAttribute('data-text');
+        window.speechSynthesis.cancel();
+        if (text) {
+          const utterance = new SpeechSynthesisUtterance(text);
+          utterance.rate = 0.95;
+          window.speechSynthesis.speak(utterance);
+        }
+        return;
+      }
+      
       if (citation) {
         const pageNum = citation.getAttribute('data-page');
         const docBody = wrapper.querySelector('#doc-viewer-body-content');
@@ -677,7 +703,10 @@ const Components = {
         <div class="flashcard-card" id="fc-card-body">
           <!-- Front side: Question -->
           <div class="flashcard-face flashcard-front">
-            <span class="flashcard-badge" style="background-color: rgba(16, 185, 129, 0.15); color: #10B981; border: 1px solid rgba(16, 185, 129, 0.2); max-width: 90%; text-overflow: ellipsis; overflow: hidden; white-space: nowrap;">
+            <button class="speaker-btn" data-text="${currentCard.question.replace(/"/g, '&quot;')}" style="position: absolute; top: 12px; right: 12px; background: transparent; border: none; color: var(--text-muted); cursor: pointer; display: flex; align-items: center; justify-content: center; padding: 4px; border-radius: 4px; transition: all 0.2s;" title="Listen to question">
+              <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path></svg>
+            </button>
+            <span class="flashcard-badge" style="background-color: rgba(16, 185, 129, 0.15); color: #10B981; border: 1px solid rgba(16, 185, 129, 0.2); max-width: 80%; text-overflow: ellipsis; overflow: hidden; white-space: nowrap;">
               ${currentCard.source_reference ? `Grounded: ${currentCard.source_reference}` : 'Concept Question'}
             </span>
             <p class="flashcard-text">${currentCard.question}</p>
@@ -689,7 +718,10 @@ const Components = {
           </div>
           <!-- Back side: Answer -->
           <div class="flashcard-face flashcard-back">
-            <span class="flashcard-badge" style="background-color: rgba(16, 185, 129, 0.15); color: #10B981; border: 1px solid rgba(16, 185, 129, 0.2); max-width: 90%; text-overflow: ellipsis; overflow: hidden; white-space: nowrap;">
+            <button class="speaker-btn" data-text="${currentCard.answer.replace(/"/g, '&quot;')}" style="position: absolute; top: 12px; right: 12px; background: transparent; border: none; color: var(--text-muted); cursor: pointer; display: flex; align-items: center; justify-content: center; padding: 4px; border-radius: 4px; transition: all 0.2s;" title="Listen to answer">
+              <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path></svg>
+            </button>
+            <span class="flashcard-badge" style="background-color: rgba(16, 185, 129, 0.15); color: #10B981; border: 1px solid rgba(16, 185, 129, 0.2); max-width: 80%; text-overflow: ellipsis; overflow: hidden; white-space: nowrap;">
               ${currentCard.source_reference ? `Grounded: ${currentCard.source_reference}` : 'AI Explanation'}
             </span>
             <p class="flashcard-text" style="font-size: 16px; font-weight: 500; text-align: left; line-height: 1.6;">${currentCard.answer}</p>
@@ -727,10 +759,24 @@ const Components = {
     const cardBody = container.querySelector('#fc-card-body');
     const sceneBox = container.querySelector('#fc-scene-box');
     sceneBox.addEventListener('click', (e) => {
-      // Don't flip if clicking inside hint area or buttons
-      if (!e.target.closest('.btn')) {
+      // Don't flip if clicking inside buttons or speaker button
+      if (!e.target.closest('.btn') && !e.target.closest('.speaker-btn')) {
         cardBody.classList.toggle('flipped');
       }
+    });
+
+    // Hook voice play events
+    container.querySelectorAll('.speaker-btn').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const text = btn.getAttribute('data-text');
+        window.speechSynthesis.cancel();
+        if (text) {
+          const utterance = new SpeechSynthesisUtterance(text);
+          utterance.rate = 0.95;
+          window.speechSynthesis.speak(utterance);
+        }
+      });
     });
 
     // Nav events
