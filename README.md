@@ -25,7 +25,7 @@ This application supports Google Gemini (`gemini-1.5-flash`) and Groq (`llama3-8
 ### Option A: Save Keys via the UI Settings (No Server Restart Needed!) - **Recommended for Live Demos**
 1. Launch the application and click **Account Settings** in the top-right profile dropdown menu.
 2. Select your active provider (Google Gemini or Groq).
-3. Paste your API Key in the corresponding **Google Gemini API Key** or **Groq API Key** input boxes.
+3. Paste your API Key in the corresponding **Google Gemini API Key** or **Groq API Key** input boxes
 4. Click **Save Settings**.
    *   *Note*: Keys are saved securely in your browser's local storage and sent via encrypted headers, completely protecting them from being saved on the server database or git commits.
 
