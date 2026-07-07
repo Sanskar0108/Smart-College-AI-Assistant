@@ -170,7 +170,7 @@ Main responsibilities:
 
 ### Krishna
 Role:
-- AI workflow, testing, and presentation lead
+- AI workflow, testing
 
 Main responsibilities:
 - Help define prompt flows for chat, flashcards, and quizzes
